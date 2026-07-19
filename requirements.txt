@@ -1,0 +1,13 @@
+pandas
+numpy
+matplotlib
+seaborn
+statsmodels
+scikit-learn
+pymc
+arviz
+streamlit
+plotly
+pytest
+python-dotenv
+openpyxl
