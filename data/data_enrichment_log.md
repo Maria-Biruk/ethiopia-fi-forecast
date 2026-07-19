@@ -56,3 +56,17 @@ added; the dataset's existing omission of 2011 is correct as-is.
 - collected_by: Maria
 - collection_date: 2026-07-19
 - notes: Regulatory foundation enabling non-bank mobile money issuers (Telebirr, later M-Pesa); earliest event in the dataset
+
+# Data Enrichment Log — Task 1 Summary
+
+Starting dataset: 57 records (30 observations, 10 events, 14 impact_links, 3 targets)
+Final dataset: 63 records (34 observations, 12 events, 14 impact_links, 3 targets)
+
+6 new records added this session, all with verified sources:
+
+- 4 observations: Telebirr users (2022, 2023), M-Pesa users (2023), 4G coverage (2024)
+- 2 events: NBE Payment Instrument Issuers Directive (2020), Telecom liberalization (2021)
+
+Key finding: Ethiopia has no 2011 Global Findex data (first surveyed in 2014) —
+the "2011: 14%" figure in the Week 11 challenge doc appears to be an error;
+no fabricated row was added for it.
