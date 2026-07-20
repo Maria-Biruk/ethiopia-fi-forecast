@@ -90,3 +90,33 @@ matching the (likely erroneous) doc figure.
 4. Ecofin Agency (ITU data) — https://www.ecofinagency.com/news-digital/0206-56088-ethiopias-incumbent-operator-extends-4g-coverage-to-52-new-cities
 5. IFC / World Bank PPP (telecom liberalization) — https://ppp.worldbank.org/zh-hans/node/9571
 6. Digital Policy Alert (NBE PII Directive) — https://digitalpolicyalert.org/event/25713-implemented-nbe-licensing-and-authorisation-of-payment-instrument-issuers-directive-no-onps012020
+
+## Enrichment Round 2 — Task 4 Usage Target Series (2026-07-20)
+
+Task 4 requires forecasting "% of adults who made or received a digital
+payment," but no such indicator_code existed in the dataset — Usage was
+previously represented only via operator proxies (Telebirr/M-Pesa users,
+P2P/ATM volumes). Three Ethiopia-specific, Findex-anchored observations
+were added to create a genuine forecastable target series.
+
+### Added: REC_0062 — Digital payment adoption, 2017
+
+- value_numeric: 12%
+- source_url: https://blogs.worldbank.org/en/africacan/financial-inclusion-in-ethiopia-10-takeaways-from-findex-2017
+- original_text: "Made or received digital payments in the past year (%) ... 12"
+- confidence: high
+
+### Added: REC_0063 — Digital payment adoption, 2021
+
+- value_numeric: 20%
+- source_url: https://blogs.worldbank.org/en/africacan/mobile-phone-technology-could-expand-equitable-access-financial-services-ethiopia
+- original_text: "20% of adults—used their accounts for digital payments"
+- confidence: high
+
+### Added: REC_0064 — Digital payment adoption, 2024
+
+- value_numeric: 35%
+- source_url: internal_challenge_doc
+- original_text: "Made or received digital payment: ~35%"
+- confidence: medium (challenge doc's approximate figure, not independently re-verified against primary 2024 Findex source)
+- notes: Lower confidence than the other two since this wasn't independently verified against a primary source
