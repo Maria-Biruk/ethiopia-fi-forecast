@@ -1,0 +1,4 @@
+Year,Access_Baseline,Access_CI_Low,Access_CI_High,Access_Pessimistic,Access_Optimistic,Usage_Baseline,Usage_CI_Low,Usage_CI_High,Usage_Pessimistic,Usage_Optimistic
+2025,54.2,45.1,63.4,54.8,68.4,36.3,17.6,54.9,38.5,41.5
+2026,56.9,47.3,66.6,55.0,69.0,39.5,19.2,59.8,42.0,48.0
+2027,59.7,49.4,69.9,55.0,69.0,42.7,20.5,64.9,45.5,54.5
