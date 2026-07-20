@@ -1,72 +1,92 @@
-## Enrichment Round 1 — Telebirr user growth (2026-07-19)
+# Data Enrichment Log — Ethiopia Financial Inclusion Forecast
 
-### Finding: 2011 Ethiopia Findex data does not exist
+**Task:** 10Academy Week 11, Task 1 — Data Exploration and Enrichment
+**Author:** Maria
+**Date:** July 2026
 
-Ethiopia was not included in the Global Findex survey until the 2014 edition
-(confirmed: World Bank's 2014 Global Findex report lists Ethiopia as one of
-9 countries added for the first time that year). The "2011: 14%" figure in
-the Week 11 challenge doc's summary table appears to be an error — there is
-no primary Findex source for Ethiopia in 2011. No 2011 ACC_OWNERSHIP row was
-added; the dataset's existing omission of 2011 is correct as-is.
+## 1. Purpose
 
-### Added: REC_0058 — Telebirr registered users, June 2022
+This log documents every record added to the starter dataset
+(`ethiopia_fi_unified_data.xlsx`) during Task 1, and one significant
+correction identified during exploration. It exists so that every
+enrichment can be independently verified against its original source.
 
-- value_numeric: 21,800,000
-- source_url: https://en.wikipedia.org/wiki/Ethio_Telecom
-- original_text: "Frehiwot said 21.8 million users signed up with this service"
-- confidence: medium (secondary source citing a company statement)
-- collected_by: Maria
-- collection_date: 2026-07-19
-- notes: Fills gap between Telebirr's May 2021 launch and the existing 2025 data point (USG_TELEBIRR_USERS)
+## 2. Methodology
 
-### Added: REC_0059 — Telebirr registered users, June 2023
+Each addition follows a fixed documentation standard, matching the
+schema's own requirements for new records:
 
-- value_numeric: 34,300,000
-- source_url: https://www.ethiotelecom.et/ethio-telecom-2022-23-annual-business-performance/
-- original_text: "telebirr has 34.3 Million subscribers with a total transaction value"
-- confidence: high (Ethio Telecom's own official annual report)
-- collected_by: Maria
-- collection_date: 2026-07-19
-- notes: Second point establishing Telebirr's growth trajectory (2022 → 2023 → 2025)
+| Field                              | Requirement                                                                        |
+| ---------------------------------- | ---------------------------------------------------------------------------------- |
+| `source_url`                       | Direct link to the primary or best-available secondary source                      |
+| `original_text`                    | Verbatim quote (under 15 words) supporting the figure                              |
+| `confidence`                       | `high` = primary/official source; `medium` = secondary source citing a primary one |
+| `collected_by` / `collection_date` | Attribution and recency tracking                                                   |
+| `notes`                            | Why the record matters — what gap it fills                                         |
 
-### Added: REC_0060 — M-Pesa registered users, December 2023
+Candidate additions were prioritized by **temporal gap-filling**: indicators
+with single-point snapshots or multi-year gaps between observations were
+targeted first, since these limit trend/growth-rate analysis the most
+(see Task 2 EDA, Dataset Overview section, for the sparsity assessment
+that drove this prioritization).
 
-- value_numeric: 3,100,000
-- source_url: https://technext24.com/2024/02/07/safaricoms-m-pesa-3-1-m-users-ethiopia/
-- original_text: "Safaricom, has posted 3.1 million M-PESA customers since its launch"
-- confidence: high
-- collected_by: Maria
-- collection_date: 2026-07-19
-- notes: Fills gap between M-Pesa's Aug 2023 launch and existing Dec 2024 data point (10.8M), establishing growth trajectory 3.1M → 10.8M
+## 3. Summary of Changes
 
-### Added: EVT_0011 — Telecom sector liberalization / first competitive license, May 2021
+| Metric        | Before | After          |
+| ------------- | ------ | -------------- |
+| Total records | 57     | 63             |
+| Observations  | 30     | 34             |
+| Events        | 10     | 12             |
+| Impact links  | 14     | 14 (unchanged) |
+| Targets       | 3      | 3 (unchanged)  |
 
-- source_url: https://ppp.worldbank.org/zh-hans/node/9571
-- original_text: "the country's first competitively tendered telecommunications license was awarded"
-- confidence: high
-- collected_by: Maria
-- collection_date: 2026-07-19
-- notes: Root regulatory event enabling Safaricom's entry; distinct from EVT_SAFARICOM (market entry, Aug 2022) and EVT_MPESA (product launch, Aug 2023)
+## 4. Additions
 
-### Added: EVT_0012 — NBE Payment Instrument Issuers Directive, April 2020
+### 4.1 Observations (4 added)
 
-- source_url: https://digitalpolicyalert.org/event/25713-implemented-nbe-licensing-and-authorisation-of-payment-instrument-issuers-directive-no-onps012020
-- original_text: "the National Bank of Ethiopia (NBE) issued the Licensing and Authorisation of Payment Instrument Issuers Directive"
-- confidence: high
-- collected_by: Maria
-- collection_date: 2026-07-19
-- notes: Regulatory foundation enabling non-bank mobile money issuers (Telebirr, later M-Pesa); earliest event in the dataset
+| ID       | Indicator                 | Value | Date       | Source                                                   | Confidence |
+| -------- | ------------------------- | ----- | ---------- | -------------------------------------------------------- | ---------- |
+| REC_0058 | Telebirr registered users | 21.8M | 2022-06-30 | Ethio Telecom (via Wikipedia)                            | Medium     |
+| REC_0059 | Telebirr registered users | 34.3M | 2023-06-30 | Ethio Telecom 2022/23 Annual Business Performance Report | High       |
+| REC_0060 | M-Pesa registered users   | 3.1M  | 2023-12-31 | Safaricom Ethiopia (via Technext)                        | High       |
+| REC_0061 | 4G population coverage    | 44%   | 2024-12-31 | ITU (via Ecofin Agency)                                  | Medium     |
 
-# Data Enrichment Log — Task 1 Summary
+**Rationale:** Prior to these additions, `USG_TELEBIRR_USERS` and
+`USG_MPESA_USERS` each had only a single 2024/2025 snapshot, making
+growth-rate calculation impossible. `ACC_4G_COV` had a 2-year gap
+(2023→2025) that these fill with an independent, cross-validating source.
 
-Starting dataset: 57 records (30 observations, 10 events, 14 impact_links, 3 targets)
-Final dataset: 63 records (34 observations, 12 events, 14 impact_links, 3 targets)
+### 4.2 Events (2 added)
 
-6 new records added this session, all with verified sources:
+| ID       | Event                                    | Date       | Category | Significance                                                                                                                                                                  |
+| -------- | ---------------------------------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| EVT_0011 | Ethiopia Telecom Sector Liberalization   | 2021-05-01 | policy   | First competitively tendered telecom license, awarded to the Safaricom-led consortium — the root regulatory event enabling Safaricom's later market entry and M-Pesa's launch |
+| EVT_0012 | NBE Payment Instrument Issuers Directive | 2020-04-01 | policy   | Established the regulatory framework permitting non-bank mobile money issuers; predates and enables Telebirr                                                                  |
 
-- 4 observations: Telebirr users (2022, 2023), M-Pesa users (2023), 4G coverage (2024)
-- 2 events: NBE Payment Instrument Issuers Directive (2020), Telecom liberalization (2021)
+**Rationale:** The original 10 events began with Telebirr's May 2021
+launch. Both additions capture the regulatory groundwork that made
+Telebirr and M-Pesa possible in the first place, extending the causal
+chain one step further back than the starter dataset provided.
 
-Key finding: Ethiopia has no 2011 Global Findex data (first surveyed in 2014) —
-the "2011: 14%" figure in the Week 11 challenge doc appears to be an error;
-no fabricated row was added for it.
+## 5. Correction: No 2011 Ethiopia Findex Data Exists
+
+The Week 11 challenge document's own summary table lists a 2011
+account-ownership figure of 14% for Ethiopia. Cross-referencing the
+World Bank's 2014 Global Findex report shows Ethiopia was not part of
+the Global Findex survey until the **2014 edition** — it was one of 9
+countries added for the first time that year. No primary 2011 Ethiopia
+Findex observation exists.
+
+**Action taken:** No 2011 `ACC_OWNERSHIP` row was added to the dataset.
+The starter dataset's existing omission of a 2011 observation is
+correct and was left as-is, rather than "fixed" with a fabricated value
+matching the (likely erroneous) doc figure.
+
+## 6. Full Source List
+
+1. Ethio Telecom / Wikipedia — https://en.wikipedia.org/wiki/Ethio_Telecom
+2. Ethio Telecom 2022/23 Annual Business Performance Report — https://www.ethiotelecom.et/ethio-telecom-2022-23-annual-business-performance/
+3. Technext (Safaricom M-Pesa reporting) — https://technext24.com/2024/02/07/safaricoms-m-pesa-3-1-m-users-ethiopia/
+4. Ecofin Agency (ITU data) — https://www.ecofinagency.com/news-digital/0206-56088-ethiopias-incumbent-operator-extends-4g-coverage-to-52-new-cities
+5. IFC / World Bank PPP (telecom liberalization) — https://ppp.worldbank.org/zh-hans/node/9571
+6. Digital Policy Alert (NBE PII Directive) — https://digitalpolicyalert.org/event/25713-implemented-nbe-licensing-and-authorisation-of-payment-instrument-issuers-directive-no-onps012020
