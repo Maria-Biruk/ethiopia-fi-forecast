@@ -7,9 +7,17 @@ st.set_page_config(page_title="Inclusion Projections", layout="wide")
 
 st.title("🎯 Financial Inclusion Projections")
 
-# -----------------------------------------
+st.markdown("""
+This page evaluates Ethiopia's progress toward the national financial inclusion
+target using forecasted account ownership for 2027. Compare different scenarios
+and assess whether projected growth is sufficient to achieve the target.
+""")
+
+st.divider()
+
+# -------------------------------------------------
 # Load Forecast Data
-# -----------------------------------------
+# -------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 FORECAST_FILE = BASE_DIR / "data" / "processed" / "forecast_results.csv"
@@ -18,107 +26,152 @@ forecast_df = pd.read_csv(FORECAST_FILE)
 
 TARGET = 60
 
-# -----------------------------------------
-# Scenario Selector
-# -----------------------------------------
+# -------------------------------------------------
+# Scenario Selection
+# -------------------------------------------------
 scenario = st.selectbox(
-    "Select Scenario",
-    ["Base", "Optimistic", "Pessimistic"]
+    "Select Forecast Scenario",
+    [
+        "Base",
+        "Optimistic",
+        "Pessimistic",
+    ],
 )
 
-# -----------------------------------------
-# Use 2027 Projection
-# -----------------------------------------
 if scenario == "Base":
     projected = forecast_df["Access_Baseline"].iloc[-1]
-
 elif scenario == "Optimistic":
     projected = forecast_df["Access_Optimistic"].iloc[-1]
-
 else:
     projected = forecast_df["Access_Pessimistic"].iloc[-1]
 
+gap = max(0, TARGET - projected)
 progress = min(projected / TARGET, 1.0)
 
-# -----------------------------------------
-# Gauge Chart
-# -----------------------------------------
-fig = go.Figure(go.Indicator(
-    mode="gauge+number",
-    value=projected,
-    title={"text": "Projected Account Ownership (2027)"},
-    gauge={
-        "axis": {"range": [0, 100]},
-        "bar": {"color": "royalblue"},
-        "threshold": {
-            "line": {"color": "red", "width": 4},
-            "value": TARGET
-        }
-    }
-))
+# -------------------------------------------------
+# KPI Summary
+# -------------------------------------------------
+st.subheader("2027 Projection Summary")
 
-st.plotly_chart(fig, use_container_width=True)
+c1, c2, c3 = st.columns(3)
 
-# -----------------------------------------
-# Progress
-# -----------------------------------------
-st.subheader("Progress Toward Target")
-
-st.progress(progress)
-
-col1, col2, col3 = st.columns(3)
-
-col1.metric(
-    "2027 Projection",
+c1.metric(
+    "Projected Account Ownership",
     f"{projected:.1f}%"
 )
 
-col2.metric(
+c2.metric(
     "National Target",
     f"{TARGET}%"
 )
 
-col3.metric(
-    "Gap Remaining",
-    f"{max(0, TARGET-projected):.1f}%"
+c3.metric(
+    "Remaining Gap",
+    f"{gap:.1f}%"
 )
 
 st.divider()
 
-# -----------------------------------------
-# Key Findings
-# -----------------------------------------
-st.subheader("Key Findings")
+# -------------------------------------------------
+# Gauge Chart
+# -------------------------------------------------
+fig = go.Figure(
+    go.Indicator(
+        mode="gauge+number",
+        value=projected,
+        title={"text": "Projected Account Ownership (2027)"},
+        gauge={
+            "axis": {"range": [0, 100]},
+            "bar": {"color": "royalblue"},
+            "steps": [
+                {"range": [0, TARGET], "color": "lightgray"},
+                {"range": [TARGET, 100], "color": "lightgreen"},
+            ],
+            "threshold": {
+                "line": {
+                    "color": "red",
+                    "width": 4,
+                },
+                "value": TARGET,
+            },
+        },
+    )
+)
 
-st.markdown(f"""
-### Will Ethiopia reach the 60% target?
+st.plotly_chart(fig, use_container_width=True)
 
-Under the **{scenario}** scenario, the projected account ownership
-rate in **2027** is **{projected:.1f}%**.
+# -------------------------------------------------
+# Progress Indicator
+# -------------------------------------------------
+st.subheader("Progress Toward National Target")
 
-""")
+st.progress(progress)
+
+st.write(
+    f"**Progress:** {progress * 100:.1f}% of the national financial inclusion target achieved."
+)
+
+st.divider()
+
+# -------------------------------------------------
+# Executive Summary
+# -------------------------------------------------
+st.subheader("Executive Summary")
 
 if projected >= TARGET:
-    st.success("✅ The forecast suggests the national target is achieved.")
+    st.success(f"""
+Under the **{scenario}** scenario, Ethiopia is projected to achieve the
+national financial inclusion target by 2027 with an estimated account
+ownership rate of **{projected:.1f}%**.
+""")
 else:
-    st.warning(
-        f"⚠️ The forecast remains {TARGET - projected:.1f} percentage points below the target."
-    )
+    st.warning(f"""
+Under the **{scenario}** scenario, Ethiopia is projected to reach
+**{projected:.1f}%** account ownership by 2027.
 
-st.subheader("Major Drivers")
-
-st.markdown("""
-- 📱 Expansion of Telebirr and mobile money services
-- 🪪 Rollout of the Fayda Digital ID program
-- 🏦 Growth in formal financial services
-- 💳 Increased adoption of digital payments
+This remains **{gap:.1f} percentage points** below the national target
+of **{TARGET}%**.
 """)
 
-st.subheader("Key Uncertainties")
+# -------------------------------------------------
+# Key Growth Drivers
+# -------------------------------------------------
+st.subheader("Key Growth Drivers")
+
+st.success("""
+- 📱 Expansion of Telebirr and mobile money services
+- 🪪 National Fayda Digital ID rollout
+- 🏦 Continued expansion of formal banking services
+- 💳 Increased adoption of digital payment platforms
+- 🌐 Improved digital infrastructure and financial accessibility
+""")
+
+# -------------------------------------------------
+# Risks and Uncertainties
+# -------------------------------------------------
+st.subheader("Risks and Uncertainties")
+
+st.info("""
+Several factors may influence future financial inclusion outcomes:
+
+- Limited historical observations available for forecasting.
+- Changes in government policy or regulation.
+- Economic growth and inflation.
+- Mobile network and digital infrastructure expansion.
+- Adoption rates in rural and underserved communities.
+""")
+
+# -------------------------------------------------
+# Strategic Recommendations
+# -------------------------------------------------
+st.subheader("Recommendations")
 
 st.markdown("""
-- Limited number of historical Findex observations
-- Pace of policy implementation
-- Economic conditions
-- Technology adoption across urban and rural areas
+To accelerate financial inclusion, stakeholders should consider:
+
+1. Expanding digital financial infrastructure.
+2. Increasing financial literacy programs.
+3. Encouraging mobile banking adoption.
+4. Supporting fintech innovation.
+5. Monitoring financial inclusion indicators regularly.
 """)

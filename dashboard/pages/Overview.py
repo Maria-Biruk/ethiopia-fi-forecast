@@ -1,79 +1,121 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
-st.set_page_config(page_title="Overview", layout="wide")
-
-st.title("📊 Financial Inclusion Overview")
-
-# Load data
 from pathlib import Path
-import pandas as pd
+
+st.set_page_config(page_title="Financial Inclusion Overview", layout="wide")
+
+# --------------------------------------------------
+# Load Data
+# --------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-
 DATA_FILE = BASE_DIR / "data" / "processed" / "ethiopia_fi_unified_data_enriched.xlsx"
 
 df = pd.read_excel(DATA_FILE)
 
-# -----------------------------
-# Current Metrics
-# -----------------------------
+st.title("📊 Financial Inclusion Overview")
+st.markdown("""
+This page provides a high-level summary of Ethiopia's financial inclusion
+performance using historical Global Findex indicators and digital finance data.
+""")
+
+# --------------------------------------------------
+# Filter Data
+# --------------------------------------------------
+
 access = df[
-    (df["indicator_code"] == "ACC_OWNERSHIP") &
-    (df["record_type"] == "observation")
-]
+    (df["indicator_code"] == "ACC_OWNERSHIP")
+    & (df["record_type"] == "observation")
+].copy()
 
 usage = df[
-    (df["indicator_code"] == "USG_DIGITAL_PAYMENT") &
-    (df["record_type"] == "observation")
-]
+    (df["indicator_code"] == "USG_DIGITAL_PAYMENT")
+    & (df["record_type"] == "observation")
+].copy()
 
-current_access = access.sort_values("observation_date").iloc[-1]["value_numeric"]
-current_usage = usage.sort_values("observation_date").iloc[-1]["value_numeric"]
+access["year"] = pd.to_datetime(access["observation_date"]).dt.year
+usage["year"] = pd.to_datetime(usage["observation_date"]).dt.year
 
-growth = current_access - access.sort_values("observation_date").iloc[-2]["value_numeric"]
+current_access = access.iloc[-1]["value_numeric"]
+current_usage = usage.iloc[-1]["value_numeric"]
 
-# Example P2P/ATM ratio
+growth = current_access - access.iloc[-2]["value_numeric"]
+
 p2p_ratio = 1.35
 
-col1, col2, col3, col4 = st.columns(4)
+# --------------------------------------------------
+# KPI Cards
+# --------------------------------------------------
 
-col1.metric(
+st.subheader("Key Performance Indicators")
+
+c1, c2, c3, c4 = st.columns(4)
+
+c1.metric(
     "Account Ownership",
-    f"{current_access:.1f}%"
+    f"{current_access:.1f}%",
+    f"{growth:.1f}%"
 )
 
-col2.metric(
+c2.metric(
     "Digital Payment Usage",
     f"{current_usage:.1f}%"
 )
 
-col3.metric(
-    "Growth Since Previous Survey",
-    f"{growth:.1f}%"
+c3.metric(
+    "Forecast Horizon",
+    "2025–2027"
 )
 
-col4.metric(
+c4.metric(
     "P2P / ATM Ratio",
     f"{p2p_ratio:.2f}"
 )
 
 st.divider()
 
-# -----------------------------
-# Account Ownership Trend
-# -----------------------------
-access["year"] = pd.to_datetime(access["observation_date"]).dt.year
+# --------------------------------------------------
+# Trend Chart
+# --------------------------------------------------
 
 fig = px.line(
     access,
     x="year",
     y="value_numeric",
     markers=True,
-    title="Account Ownership Over Time"
+    title="Account Ownership Trend",
+)
+
+fig.update_layout(
+    xaxis_title="Year",
+    yaxis_title="Population (%)",
 )
 
 st.plotly_chart(fig, use_container_width=True)
 
-st.dataframe(access)
+# --------------------------------------------------
+# Business Insights
+# --------------------------------------------------
+
+st.subheader("Business Insights")
+
+st.success(
+    """
+• Financial account ownership has steadily increased over time.
+
+• Digital financial services continue to expand across Ethiopia.
+
+• Forecasts indicate continued growth through 2027.
+
+• Policymakers and financial institutions can use these projections to
+support investment and financial inclusion strategies.
+"""
+)
+
+# --------------------------------------------------
+# Data Preview
+# --------------------------------------------------
+
+with st.expander("View Processed Dataset"):
+    st.dataframe(access, use_container_width=True)
