@@ -5,7 +5,16 @@ from pathlib import Path
 
 st.set_page_config(page_title="Forecasts", layout="wide")
 
-st.title("📈 Forecasts (2025–2027)")
+st.title("📈 Financial Inclusion Forecasts (2025–2027)")
+
+st.markdown("""
+This dashboard presents forecasted financial inclusion indicators for Ethiopia
+under multiple scenarios. Compare historical performance with projected
+outcomes and explore how different assumptions influence future financial
+access and digital payment adoption.
+""")
+
+st.divider()
 
 # -------------------------------------------------
 # Load Data
@@ -19,20 +28,28 @@ df = pd.read_excel(DATA_FILE)
 forecast_df = pd.read_csv(FORECAST_FILE)
 
 # -------------------------------------------------
-# Indicator Selector
+# Selectors
 # -------------------------------------------------
-indicator = st.selectbox(
-    "Select Forecast Indicator",
-    ["Account Ownership", "Digital Payment Usage"]
-)
+col1, col2 = st.columns(2)
 
-# -------------------------------------------------
-# Scenario Selector
-# -------------------------------------------------
-scenario = st.selectbox(
-    "Select Scenario",
-    ["Base", "Optimistic", "Pessimistic"]
-)
+with col1:
+    indicator = st.selectbox(
+        "Forecast Indicator",
+        [
+            "Account Ownership",
+            "Digital Payment Usage",
+        ],
+    )
+
+with col2:
+    scenario = st.selectbox(
+        "Scenario",
+        [
+            "Base",
+            "Optimistic",
+            "Pessimistic",
+        ],
+    )
 
 # -------------------------------------------------
 # Historical Data
@@ -40,8 +57,8 @@ scenario = st.selectbox(
 if indicator == "Account Ownership":
 
     historical = df[
-        (df["indicator_code"] == "ACC_OWNERSHIP") &
-        (df["record_type"] == "observation")
+        (df["indicator_code"] == "ACC_OWNERSHIP")
+        & (df["record_type"] == "observation")
     ].copy()
 
     historical["year"] = pd.to_datetime(
@@ -63,8 +80,8 @@ if indicator == "Account Ownership":
 else:
 
     historical = df[
-        (df["indicator_code"] == "USG_DIGITAL_PAYMENT") &
-        (df["record_type"] == "observation")
+        (df["indicator_code"] == "USG_DIGITAL_PAYMENT")
+        & (df["record_type"] == "observation")
     ].copy()
 
     historical["year"] = pd.to_datetime(
@@ -86,15 +103,20 @@ else:
 years = forecast_df["Year"]
 
 # -------------------------------------------------
-# Key Metrics
+# KPI Summary
 # -------------------------------------------------
 st.subheader("Forecast Summary")
 
-col1, col2, col3 = st.columns(3)
+latest_actual = historical.iloc[-1]["value_numeric"]
+projected_2027 = forecast.iloc[-1]
+growth = projected_2027 - latest_actual
 
-col1.metric("2025", f"{forecast.iloc[0]:.1f}%")
-col2.metric("2026", f"{forecast.iloc[1]:.1f}%")
-col3.metric("2027", f"{forecast.iloc[2]:.1f}%")
+c1, c2, c3, c4 = st.columns(4)
+
+c1.metric("Forecast 2025", f"{forecast.iloc[0]:.1f}%")
+c2.metric("Forecast 2026", f"{forecast.iloc[1]:.1f}%")
+c3.metric("Forecast 2027", f"{forecast.iloc[2]:.1f}%")
+c4.metric("Projected Growth", f"{growth:.1f}%")
 
 st.divider()
 
@@ -103,17 +125,15 @@ st.divider()
 # -------------------------------------------------
 fig = go.Figure()
 
-# Historical Data
 fig.add_trace(
     go.Scatter(
         x=historical["year"],
         y=historical["value_numeric"],
         mode="lines+markers",
-        name="Historical",
+        name="Historical Data",
     )
 )
 
-# Forecast
 fig.add_trace(
     go.Scatter(
         x=years,
@@ -123,7 +143,6 @@ fig.add_trace(
     )
 )
 
-# Confidence Interval
 fig.add_trace(
     go.Scatter(
         x=list(years) + list(years[::-1]),
@@ -132,12 +151,12 @@ fig.add_trace(
         fillcolor="rgba(0,100,255,0.2)",
         line=dict(color="rgba(255,255,255,0)"),
         hoverinfo="skip",
-        name="Confidence Interval",
+        name="95% Confidence Interval",
     )
 )
 
 fig.update_layout(
-    title=f"{indicator} Forecast ({scenario} Scenario)",
+    title=f"{indicator}: Historical Trend and {scenario} Forecast",
     xaxis_title="Year",
     yaxis_title="Percentage of Adults",
     hovermode="x unified",
@@ -146,14 +165,40 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------
+# Business Impact
+# -------------------------------------------------
+st.subheader("Business Impact")
+
+st.success(f"""
+### Key Insights
+
+• Under the **{scenario}** scenario, **{indicator}** is expected to continue
+growing through 2027.
+
+• Confidence intervals highlight the uncertainty around future projections
+while providing a reasonable range for expected outcomes.
+
+• These forecasts can support policymakers, financial institutions,
+and development partners in planning investments and financial inclusion
+initiatives.
+
+• Scenario analysis helps stakeholders evaluate both opportunities and risks
+associated with Ethiopia's digital financial transformation.
+""")
+
+# -------------------------------------------------
 # Forecast Table
 # -------------------------------------------------
-st.subheader("Forecast Results")
+st.subheader("Forecast Dataset")
 
-st.dataframe(forecast_df, use_container_width=True)
+with st.expander("View Forecast Results"):
+    st.dataframe(
+        forecast_df,
+        use_container_width=True,
+    )
 
 # -------------------------------------------------
-# Download Button
+# Download
 # -------------------------------------------------
 st.download_button(
     "⬇ Download Forecast Results",
@@ -168,16 +213,16 @@ st.download_button(
 st.subheader("Interpretation")
 
 if indicator == "Account Ownership":
-    st.info(
-        "The forecast suggests that account ownership will continue "
-        "to grow through 2027. Scenario differences reflect varying "
-        "assumptions about the impact of financial inclusion initiatives "
-        "such as Telebirr expansion and the Fayda Digital ID rollout."
-    )
+    st.info("""
+Financial account ownership is projected to continue increasing through
+2027. Continued expansion of digital financial services, improved access
+to banking infrastructure, and national financial inclusion initiatives
+are expected to support this positive trend.
+""")
 else:
-    st.info(
-        "Digital payment usage is projected to increase steadily "
-        "between 2025 and 2027. Higher adoption is expected under the "
-        "optimistic scenario due to continued growth in mobile money "
-        "and digital financial services."
-    )
+    st.info("""
+Digital payment adoption is expected to grow steadily over the forecast
+period. Expansion of mobile money services, digital banking platforms,
+and broader digital identification initiatives could further accelerate
+usage under the optimistic scenario.
+""")
